@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Кейс: карточка кардигана на Wildberries — анализ, стратегия, промпты</title>
+<style>
+:root{
+  --milk:#F5EFE8;--milk-2:#FBF7F1;--paper:#FFFFFF;
+  --graphite:#2E2E33;--ink:#3A3A3D;--muted:#8C867E;
+  --line:#E4DBD1;--rose:#B58B86;--rose-deep:#9C6E69;--rose-hair:#DAC7C2;
+  --ok:#7E8B6F;--warn:#B98A5E;
+  --shadow:0 30px 70px -40px rgba(46,46,51,.45);
+  --serif:"Georgia","Times New Roman",serif;
+  --sans:"Helvetica Neue",Arial,"Segoe UI",system-ui,sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--milk);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+
+.kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--rose-deep);font-weight:600;display:inline-flex;align-items:center;gap:14px}
+.kicker.light{color:var(--rose-hair)}
+.kicker .ln{width:34px;height:1px;background:var(--rose-hair);display:inline-block}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.1}
+.display{font-family:var(--serif);font-weight:400;line-height:1.05}
+.lead{font-size:clamp(19px,2.1vw,23px);line-height:1.55;color:#4a4a4d}
+.small{font-size:13.5px;letter-spacing:.02em;color:var(--muted)}
+.rule{width:64px;height:1px;background:var(--rose);border:0}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 40px}
+section{position:relative}
+.block{padding:110px 0}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.delay1{transition-delay:.09s}.delay2{transition-delay:.18s}.delay3{transition-delay:.27s}.delay4{transition-delay:.36s}.delay5{transition-delay:.45s}
+
+/* header */
+header{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:20px 40px;transition:.5s;color:#fff}
+header.solid{background:rgba(245,239,232,.92);backdrop-filter:blur(14px);color:var(--ink);padding:13px 40px;box-shadow:0 1px 0 var(--line)}
+.brand{font-family:var(--serif);font-size:15px;letter-spacing:.26em;text-transform:uppercase}
+.brand b{color:var(--rose)}
+.nav{display:flex;gap:26px;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase}
+.nav a{opacity:.82;transition:.3s}.nav a:hover{opacity:1}
+@media(max-width:980px){.nav{display:none}}
+
+/* progress bar */
+#prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--rose);z-index:70;transition:width .1s linear}
+
+/* hero */
+.hero{min-height:100svh;position:relative;overflow:hidden;background:#1f1f1e;display:flex;align-items:center}
+.hero .bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:52% 28%;transform:scale(1.06);animation:hz 10s ease forwards}
+@keyframes hz{to{transform:scale(1)}}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,rgba(18,17,18,.92) 0%,rgba(18,17,18,.66) 36%,rgba(18,17,18,.18) 68%,rgba(18,17,18,.5) 100%)}
+.hero .inner{position:relative;z-index:3;color:#fff;padding-top:60px}
+.hero .tagrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.htag{border:1px solid rgba(255,255,255,.42);border-radius:100px;padding:7px 16px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;backdrop-filter:blur(4px)}
+.hero h1{font-size:clamp(40px,7vw,88px);letter-spacing:.01em;max-width:17ch;text-shadow:0 2px 44px rgba(0,0,0,.4)}
+.hero h1 em{font-style:italic;color:#f2e4e0}
+.hero .sub{margin-top:26px;max-width:56ch;font-size:clamp(16px,1.7vw,20px);color:#ece5de;line-height:1.55}
+.hero .flow{display:flex;gap:10px;flex-wrap:wrap;margin-top:40px;align-items:center;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:#e7ded7}
+.hero .flow b{font-family:var(--serif);font-style:italic;color:var(--rose-hair);font-size:16px;text-transform:none;letter-spacing:0}
+.hero .flow .ar{color:var(--rose);opacity:.85}
+.scroll-cue{position:absolute;left:40px;bottom:26px;z-index:4;color:#fff;font-size:11px;letter-spacing:.28em;text-transform:uppercase;opacity:.85;display:flex;align-items:center;gap:14px}
+.scroll-cue .bar{width:46px;height:1px;background:linear-gradient(90deg,#fff,transparent);animation:cue 2s infinite}
+@keyframes cue{0%{opacity:.2;transform:scaleX(.3);transform-origin:left}50%{opacity:1}100%{opacity:.2;transform:scaleX(1);transform-origin:left}}
+
+/* part divider */
+.part{padding:96px 0;background:var(--graphite);color:#efe9e2;text-align:center;position:relative;overflow:hidden}
+.part .rn{font-family:var(--serif);font-style:italic;font-size:clamp(60px,12vw,150px);color:#3c3c43;line-height:.9;letter-spacing:.02em}
+.part .lbl{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--rose);margin-top:-20px}
+.part h2{font-size:clamp(30px,5vw,58px);color:#fff;max-width:20ch;margin:20px auto 0}
+.part p{max-width:52ch;margin:22px auto 0;color:#a9a29a;font-size:16px}
+
+/* section head */
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-bottom:52px;flex-wrap:wrap}
+.shead .t h2{font-size:clamp(27px,3.6vw,46px);margin-top:14px}
+.shead .meta{max-width:40ch;color:var(--muted);font-size:15.5px}
+.stage-num{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:15px}
+
+/* big quote */
+.bigquote{border-left:2px solid var(--rose);padding:6px 0 6px 34px}
+.bigquote p{font-family:var(--serif);font-size:clamp(23px,3vw,38px);line-height:1.3;color:var(--graphite)}
+.bigquote p em{font-style:italic;color:var(--rose-deep)}
+
+/* metrics table style */
+.mtable{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:16px}
+.mtable .cell{background:var(--paper);padding:26px 24px}
+.mtable .cell b{font-family:var(--serif);font-size:32px;font-weight:400;display:block;color:var(--graphite)}
+.mtable .cell.neg b{color:var(--rose-deep)}
+.mtable .cell span{font-size:13px;color:var(--muted);letter-spacing:.03em}
+@media(max-width:760px){.mtable{grid-template-columns:1fr 1fr}}
+
+/* strengths */
+.str{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;margin-top:16px}
+.str .ph{position:relative;overflow:hidden;aspect-ratio:4/5;background:var(--milk-2)}
+.str .ph img{width:100%;height:100%;object-fit:cover}
+.slist{display:flex;flex-direction:column;margin-top:22px}
+.slist .r{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.slist .r .nm{font-size:16px}
+.slist .r .ct{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:16px;white-space:nowrap}
+@media(max-width:860px){.str{grid-template-columns:1fr;gap:30px}}
+
+/* problems */
+.problems{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.prob{background:var(--paper);border:1px solid var(--line);padding:30px 26px 28px;transition:transform .5s ease,box-shadow .5s ease}
+.prob:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.prob .no{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:15px}
+.prob h3{font-size:20px;margin:10px 0 12px;line-height:1.2}
+.prob p{font-size:14.5px;color:var(--muted);line-height:1.55}
+.prob .tagline{margin-top:16px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn)}
+@media(max-width:860px){.problems{grid-template-columns:1fr}}
+
+/* generic card grids */
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--paper);border:1px solid var(--line);padding:30px 28px}
+.card h3{font-size:21px;margin-bottom:12px}
+.card ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.card li{font-size:15px;color:#4a4a4d;padding-left:20px;position:relative}
+.card li::before{content:"";position:absolute;left:0;top:11px;width:6px;height:1px;background:var(--rose)}
+@media(max-width:860px){.cards2,.cards3{grid-template-columns:1fr}}
+
+/* pill hypotheses */
+.pills{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.pill{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 22px;font-family:var(--serif);font-size:19px;display:flex;gap:16px;align-items:center}
+.pill .g{font-style:italic;color:var(--rose);font-size:16px}
+
+/* seller response */
+.dialog{background:var(--milk-2);border:1px solid var(--line);border-radius:8px;padding:34px 36px;position:relative}
+.dialog .q{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:16px}
+.dialog p{font-family:var(--serif);font-size:clamp(19px,2.2vw,26px);line-height:1.4;color:var(--graphite)}
+.principle-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px}
+.principle-row .p{border:1px solid var(--rose-hair);color:var(--rose-deep);border-radius:100px;padding:8px 16px;font-size:13px}
+
+/* priorities / steps */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:12px 44px}
+.steps .ti{display:flex;gap:18px;padding:18px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.steps .ti .s{flex:0 0 auto;width:40px;height:40px;border:1px solid var(--rose);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;color:var(--rose-deep);font-size:17px}
+.steps .ti .d b{display:block;font-family:var(--serif);font-size:18px;font-weight:400;margin-bottom:2px}
+.steps .ti .d span{font-size:14px;color:var(--muted)}
+@media(max-width:860px){.steps{grid-template-columns:1fr}}
+
+/* strategy */
+.strat{background:var(--milk-2)}
+.formula{display:flex;flex-wrap:wrap;gap:12px 8px;align-items:center;margin-top:30px}
+.formula .f{background:var(--paper);border:1px solid var(--line);border-radius:100px;padding:11px 20px;font-family:var(--serif);font-size:17px}
+.formula .ar{color:var(--rose);font-size:16px}
+
+/* funnel table */
+table.fn{width:100%;border-collapse:collapse;background:var(--paper);box-shadow:var(--shadow)}
+table.fn th,table.fn td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line);font-size:15px;vertical-align:top}
+table.fn thead th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--milk-2)}
+table.fn tbody td:first-child{font-family:var(--serif);font-style:italic;color:var(--rose);width:48px;font-size:19px}
+table.fn tbody td.task{width:220px;color:var(--muted);font-size:13px;letter-spacing:.02em;text-transform:uppercase}
+table.fn tbody td.h{font-family:var(--serif);font-size:17px;color:var(--graphite)}
+table.fn tbody tr:hover{background:#fbf6f4}
+table.fn tbody tr:last-child td{border-bottom:0}
+@media(max-width:720px){table.fn td.task,table.fn th:nth-child(2){display:none}}
+
+/* slide cards */
+.slides{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.slidecard{background:var(--paper);border:1px solid var(--line);padding:28px 30px;display:flex;flex-direction:column;gap:8px;transition:transform .5s,box-shadow .5s}
+.slidecard:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.slidecard .top{display:flex;align-items:baseline;gap:14px}
+.slidecard .top .no{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:26px;line-height:1}
+.slidecard .top .task{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.slidecard h3{font-size:23px;margin-top:2px}
+.slidecard .subh{color:var(--rose-deep);font-size:15px}
+.slidecard .vis{font-size:14px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:14px;margin-top:6px}
+@media(max-width:860px){.slides{grid-template-columns:1fr}}
+
+/* tone two-col */
+.tone{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.tcol{border-radius:8px;padding:32px 32px 26px}
+.tcol.good{background:#F1F3EC;border:1px solid #DCE2D2}
+.tcol.bad{background:#F8EFE9;border:1px solid #EBD8CC}
+.tcol h3{font-size:20px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.tcol h3 .m{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
+.tcol.good h3 .m{background:var(--ok)}.tcol.bad h3 .m{background:#C6805E}
+.tcol ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.tcol li{font-size:15.5px;padding-left:22px;position:relative;color:#4a4a4d}
+.tcol.good li::before{content:"✓";position:absolute;left:0;color:var(--ok)}
+.tcol.bad li::before{content:"✕";position:absolute;left:0;color:#C6805E}
+@media(max-width:760px){.tone{grid-template-columns:1fr}}
+
+/* faq */
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;font-family:var(--serif);font-size:clamp(18px,2vw,22px);gap:20px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pl{color:var(--rose);font-size:26px;transition:transform .35s;font-family:var(--sans);font-weight:300}
+.faq details[open] summary .pl{transform:rotate(45deg)}
+.faq .ans{padding:0 4px 24px;color:var(--muted);font-size:16px;max-width:62ch}
+
+/* delete list */
+.dellist{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.dellist .x{background:var(--paper);border:1px solid var(--line);border-radius:100px;padding:10px 18px;font-size:14px;color:#6a6a6d;display:flex;gap:10px;align-items:center;text-decoration:line-through;text-decoration-color:var(--rose-hair)}
+.dellist .x .m{color:#C6805E;text-decoration:none}
+
+/* palette */
+.palette{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
+.sw{display:flex;flex-direction:column;gap:10px;align-items:center}
+.sw .box{width:92px;height:92px;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.sw span{font-size:11.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.principles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 40px;margin-top:36px;max-width:760px}
+.principles .pr{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.principles .pr b{font-family:var(--serif);font-style:italic;color:var(--rose)}
+@media(max-width:860px){.principles{grid-template-columns:1fr}}
+
+/* model split */
+.msplit{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.msplit .ph{position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--milk-2)}
+.msplit .ph img{width:100%;height:100%;object-fit:cover}
+.spec{display:flex;flex-direction:column;margin-top:20px}
+.spec .r{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.spec .r .k{width:150px;flex:0 0 auto;color:var(--muted);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.spec .r .v{font-family:var(--serif);font-size:17px}
+@media(max-width:860px){.msplit{grid-template-columns:1fr;gap:30px}}
+
+/* looks */
+.looks{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.look .ph{position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--milk-2)}
+.look .ph img{width:100%;height:100%;object-fit:cover;transition:transform 1.3s cubic-bezier(.2,.7,.2,1)}
+.look:hover .ph img{transform:scale(1.05)}
+.look .info{padding:18px 2px 0}
+.look .info .no{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:14px}
+.look .info h3{font-size:19px;margin:4px 0 6px}
+.look .info p{font-size:13.5px;color:var(--muted);line-height:1.5}
+@media(max-width:900px){.looks{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.looks{grid-template-columns:1fr}}
+
+/* brief specs grid */
+.brief{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.bcard{background:var(--paper);border:1px solid var(--line);padding:28px 26px}
+.bcard .i{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:20px}
+.bcard h3{font-size:19px;margin:8px 0 12px}
+.bcard ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.bcard li{font-size:14px;color:#555;padding-left:18px;position:relative;line-height:1.45}
+.bcard li::before{content:"";position:absolute;left:0;top:10px;width:6px;height:1px;background:var(--rose)}
+@media(max-width:860px){.brief{grid-template-columns:1fr}}
+
+/* interior lifestyle */
+.life{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px;margin-top:16px}
+.life .ph{position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--milk-2)}
+.life .ph.big{grid-row:span 1;aspect-ratio:auto;min-height:100%}
+.life .ph img{width:100%;height:100%;object-fit:cover;transition:transform 1.5s ease}
+.life .ph:hover img{transform:scale(1.05)}
+@media(max-width:860px){.life{grid-template-columns:1fr 1fr}}
+
+/* prompts */
+.prompts-sec{background:var(--graphite);color:#e9e4de}
+.prompts-sec .shead .t h2{color:#fff}
+.prompts-sec .shead .meta{color:#a9a29a}
+.prompts-sec .kicker{color:var(--rose-hair)}
+.prompt{display:grid;grid-template-columns:1fr 1.1fr;gap:0;background:#37373d;border:1px solid #45454c;border-radius:6px;overflow:hidden;margin-bottom:24px}
+.prompt.rev{grid-template-columns:1.1fr 1fr}
+.prompt .code{padding:32px 32px 28px}
+.prompt .code .tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose);margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.prompt .code .tag .dot{width:8px;height:8px;border-radius:50%;background:var(--rose)}
+.prompt .code h3{color:#fff;font-size:23px;margin-bottom:16px}
+.prompt .code .txt{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#c9c3bb;white-space:pre-wrap;border-left:2px solid #52525a;padding-left:18px}
+.prompt .code .txt .k{color:#e8b8b2}
+.prompt .code .refs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.prompt .code .refs .r{font-size:11px;letter-spacing:.06em;color:#a9a29a;border:1px solid #52525a;border-radius:100px;padding:5px 12px}
+.prompt .out{position:relative;background:#2a2a2f;display:flex;flex-direction:column}
+.prompt .out .imgs{flex:1;display:grid;gap:2px}
+.prompt .out .imgs.two{grid-template-columns:1fr 1fr}
+.prompt .out .imgs.four{grid-template-columns:1fr 1fr}
+.prompt .out .imgs .im{position:relative;overflow:hidden;background:#222}
+.prompt .out .imgs .im img{width:100%;height:100%;object-fit:cover;min-height:210px;transition:transform 1.2s ease}
+.prompt .out .imgs .im:hover img{transform:scale(1.05)}
+.prompt .out .cap{padding:13px 20px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#8f8a82;border-top:1px solid #45454c}
+@media(max-width:900px){.prompt,.prompt.rev{grid-template-columns:1fr}.prompt .out .imgs .im img{min-height:240px}}
+.technique{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:14px}
+.tq{border:1px solid #45454c;border-radius:6px;padding:24px 22px;background:#33333a}
+.tq .i{font-family:var(--serif);font-style:italic;color:var(--rose);font-size:20px}
+.tq h4{color:#fff;font-family:var(--serif);font-weight:400;font-size:18px;margin:8px 0}
+.tq p{font-size:13.5px;color:#b0aaa2;line-height:1.55}
+@media(max-width:860px){.technique{grid-template-columns:1fr}}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;grid-auto-flow:dense}
+.gcell{position:relative;overflow:hidden;background:var(--milk-2);aspect-ratio:3/4}
+.gcell.wide{grid-column:span 2}
+.gcell.wide.plain{grid-row:span 2}
+.gcell img{width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.gcell:hover img{transform:scale(1.05)}
+.gcell .cap{position:absolute;left:16px;bottom:14px;z-index:2;color:#fff;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+.gcell::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 58%,rgba(0,0,0,.5))}
+.gcell.plain::after{display:none}
+@media(max-width:900px){.gallery{grid-template-columns:1fr 1fr}}
+
+/* insight */
+.insight{background:var(--graphite);color:#fff;padding:48px 52px;border-radius:6px;margin-top:56px}
+.insight .kicker{color:var(--rose-hair);margin-bottom:16px}
+.insight p{font-family:var(--serif);font-size:clamp(22px,2.6vw,32px);line-height:1.3;max-width:28ch}
+.insight p em{font-style:italic;color:var(--rose-hair)}
+@media(max-width:860px){.insight{padding:34px 28px}}
+
+/* footer */
+footer{background:var(--graphite);color:#cfc9c2;padding:74px 0 44px}
+footer .fbrand{font-family:var(--serif);font-size:22px;letter-spacing:.24em;text-transform:uppercase;color:#fff}
+footer .fbrand b{color:var(--rose)}
+footer .cols{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin:38px 0 52px}
+footer .col h4{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--rose-hair);margin-bottom:14px;font-weight:600}
+footer .col p,footer .col a{display:block;font-size:14.5px;color:#b7b1a9;margin-bottom:8px}
+footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12px;color:#8a857e}
+
+@media(max-width:860px){
+  .wrap{padding:0 22px}
+  header,header.solid{padding:14px 22px}
+  .block{padding:70px 0}
+  .part{padding:66px 0}
+  .scroll-cue{left:22px}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+
+<header id="hdr">
+  <div class="brand">КЕЙС · <b>Кардиган</b> · Wildberries</div>
+  <nav class="nav">
+    <a href="#analysis">Анализ</a>
+    <a href="#funnel">Воронка</a>
+    <a href="#tone">Тон</a>
+    <a href="#brief">Съёмка</a>
+    <a href="#prompts">Промпты</a>
+    <a href="#result">Результат</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="bg"><img src="assets/look-milk-full.jpg" alt="Кардиган"></div>
+  <div class="wrap inner">
+    <div class="tagrow">
+      <span class="htag">Анализ карточки</span>
+      <span class="htag">Контентная воронка</span>
+      <span class="htag">Промпты для ИИ</span>
+    </div>
+    <h1 class="display">Как мы пересобрали <em>карточку кардигана</em> на Wildberries</h1>
+    <p class="sub">Полный разбор проекта по документу: от анализа отзывов и метрик — к эмоциональной фотоворонке, брифу съёмки и промптам для нейросети, которые собрали весь визуал без единой студийной съёмки.</p>
+    <div class="flow">
+      <b>Анализ</b><span class="ar">→</span><b>Воронка</b><span class="ar">→</span><b>Тон и стиль</b><span class="ar">→</span><b>Съёмка</b><span class="ar">→</span><b>Промпты</b><span class="ar">→</span><b>Результат</b>
+    </div>
+  </div>
+  <div class="scroll-cue"><span class="bar"></span><span>Листайте — по разделам документа</span></div>
+</section>
+
+<!-- ============ PART I ============ -->
+<section class="part" id="analysis">
+  <div class="wrap">
+    <div class="rn">I</div>
+    <div class="lbl">Часть первая</div>
+    <h2>Анализ карточки</h2>
+    <p>Действуем как аналитик-маркетолог: смотрим отзывы и метрики, находим сильные и слабые стороны, решаем, что мешает продажам.</p>
+  </div>
+</section>
+
+<!-- Главный вывод -->
+<section class="block wrap">
+  <div class="kicker reveal"><span class="ln"></span>Главный вывод</div>
+  <div class="bigquote reveal delay1" style="margin-top:24px">
+    <p>Товар сам по себе покупателям нравится, но карточка теряет продажи из-за <em>неопределённости с размером</em>, перегруженной галереи и недостатка доверия к изображениям. Добавлять инфографику не нужно — нужно сократить и уточнить.</p>
+  </div>
+</section>
+
+<!-- Что видно сейчас -->
+<section class="block wrap" style="padding-top:0">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Что видно сейчас</div><h2>Цифры карточки</h2></div>
+    <p class="meta reveal delay1">Публичная карточка JAXOVER на 20 июля и выгрузка из 86 отзывов за 6 марта — 15 июля.</p>
+  </div>
+  <div class="mtable reveal">
+    <div class="cell"><b>4,8</b><span>Рейтинг публичной карточки</span></div>
+    <div class="cell"><b>156</b><span>Оценок · 16 вопросов</span></div>
+    <div class="cell"><b>87%</b><span>Считают, что размер соответствует</span></div>
+    <div class="cell"><b>4,52</b><span>Средняя оценка в выгрузке</span></div>
+    <div class="cell"><b>83,7%</b><span>Оценки «5» · «1» — 9,3%</span></div>
+    <div class="cell"><b>48,8%</b><span>Отзывов с текстом</span></div>
+    <div class="cell neg"><b>0</b><span>Отзывов с фото</span></div>
+    <div class="cell"><b>80,2%</b><span>Ответов продавца</span></div>
+    <div class="cell neg"><b>~30</b><span>Изображений — перегруз галереи</span></div>
+  </div>
+</section>
+
+<!-- Сильные стороны -->
+<section class="block wrap" style="padding-top:0">
+  <div class="str">
+    <div class="reveal">
+      <div class="kicker"><span class="ln"></span>Сильные стороны</div>
+      <h2 style="font-size:clamp(24px,2.8vw,34px);margin-top:14px">Что покупатели ценят на самом деле</h2>
+      <p style="color:var(--muted);margin-top:12px;font-size:15.5px">Из 42 текстовых отзывов покупательницы сами формулируют ценность — на неё и опираемся.</p>
+      <div class="slist">
+        <div class="r"><span class="nm">Тонкий и лёгкий материал</span><span class="ct">15 из 42</span></div>
+        <div class="r"><span class="nm">Мягкий, приятный к телу</span><span class="ct">15</span></div>
+        <div class="r"><span class="nm">Женственный, красивый, нарядный</span><span class="ct">12</span></div>
+        <div class="r"><span class="nm">Хорошее качество пошива</span><span class="ct">~10</span></div>
+        <div class="r"><span class="nm">Сочетается с джинсами, юбкой, брюками</span><span class="ct">8</span></div>
+        <div class="r"><span class="nm">Подходит как подарок маме</span><span class="ct">4</span></div>
+      </div>
+    </div>
+    <div class="ph reveal delay1"><img src="assets/look-open-3q.jpg" alt="Кардиган"></div>
+  </div>
+</section>
+
+<!-- Слабые стороны -->
+<section class="block wrap" style="padding-top:0">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Основные слабые стороны</div><h2>Шесть проблем карточки</h2></div>
+    <p class="meta reveal delay1">Каждая бьёт по выкупу сильнее, чем по кликам. Расставлены по приоритету.</p>
+  </div>
+  <div class="problems">
+    <div class="prob reveal"><div class="no">01</div><h3>Размер противоречит сам себе</h3><p>48–62 и 46–62 на разных слайдах, размер 56 дублируется, у модели разные параметры, продавец советует то 48, то 54–56. Выбрать невозможно.</p><div class="tagline">Сначала — перемер партии</div></div>
+    <div class="prob reveal delay1"><div class="no">02</div><h3>Галерея перегружена</h3><p>Около 30 материалов, значительная часть повторяется. Одни модели и тезисы по кругу — но нет однозначной размерной таблицы.</p><div class="tagline">Оставить 10–12</div></div>
+    <div class="prob reveal delay2"><div class="no">03</div><h3>Изображения снижают доверие</h3><p>Часть кадров выглядит переретушированной. На разных моделях меняются длина, объём, посадка и насыщенность принта.</p><div class="tagline">Реальные модели</div></div>
+    <div class="prob reveal"><div class="no">04</div><h3>Неверное ожидание от ткани</h3><p>«Думала будет плотнее», «на фото лучше». «Для любого сезона» создаёт ложное ожидание от тонкого трикотажа 35/65.</p><div class="tagline">Говорить честно</div></div>
+    <div class="prob reveal delay1"><div class="no">05</div><h3>Позиционирование конфликтует</h3><p>Товар зовут стильным, а в отзывах — «кофта для бабушек». Продавец сам повторяет это слово и закрепляет восприятие.</p><div class="tagline">Убрать «бабушку»</div></div>
+    <div class="prob reveal delay2"><div class="no">06</div><h3>Слабое соц. доказательство</h3><p>Ни одного отзыва с фото. Для одежды реальное фото покупателя убедительнее пяти инфографических слайдов.</p><div class="tagline">Собрать фотоотзывы</div></div>
+  </div>
+</section>
+
+<!-- Рекомендуемая фотоворонка (table) -->
+<section class="block wrap" style="padding-top:0">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Рекомендуемая фотоворонка</div><h2>12 слайдов — задача каждого</h2></div>
+    <p class="meta reveal delay1">Плюс видео 10–15 сек: образ спереди, поворот боком и спиной, застёгнут и расстёгнут, макро ткани.</p>
+  </div>
+  <div class="reveal">
+  <table class="fn">
+    <thead><tr><th>№</th><th>Задача слайда</th><th>Содержание</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="task">Остановить внимание</td><td class="h">Реальная модель · «Лёгкий кардиган 48–62»</td></tr>
+      <tr><td>2</td><td class="task">Сформировать ожидание</td><td class="h">Макро ткани на просвет · «Тонкий, неутеплённый»</td></tr>
+      <tr><td>3</td><td class="task">Показать посадку</td><td class="h">Одна модель спереди, сбоку и сзади</td></tr>
+      <tr><td>4</td><td class="task">Помочь выбрать размер</td><td class="h">Точная таблица замеров изделия</td></tr>
+      <tr><td>5</td><td class="task">Посадка на разном росте</td><td class="h">Две модели: рост 158 и 170+</td></tr>
+      <tr><td>6</td><td class="task">Доказать качество</td><td class="h">Швы, манжеты, планка, пуговицы крупно</td></tr>
+      <tr><td>7</td><td class="task">Показать вариативность</td><td class="h">Застёгнут и расстёгнут поверх топа</td></tr>
+      <tr><td>8</td><td class="task">Дать готовые образы</td><td class="h">С джинсами, юбкой и брюками</td></tr>
+      <tr><td>9</td><td class="task">Точно показать цвет</td><td class="h">Принт при нейтральном дневном свете</td></tr>
+      <tr><td>10</td><td class="task">Снять страх ухода</td><td class="h">«Бережная стирка до 30°C, сушка лёжа»</td></tr>
+      <tr><td>11</td><td class="task">Добавить доверие</td><td class="h">2–3 настоящих цитаты покупателей</td></tr>
+      <tr><td>12</td><td class="task">Закрыть на покупку</td><td class="h">«Для себя или в подарок маме»</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- Первая фотография + Название + Ответы -->
+<section class="block wrap" style="padding-top:0">
+  <div class="cards2">
+    <div class="card reveal">
+      <div class="kicker" style="margin-bottom:14px"><span class="ln"></span>Что изменить на обложке</div>
+      <h3>Первая фотография</h3>
+      <p style="color:var(--muted);font-size:14.5px;margin-bottom:14px">Сейчас перегружена: заголовок, надписи, четыре преимущества, размеры и цветы. Оставить только:</p>
+      <ul>
+        <li>реальную модель</li>
+        <li>крупно сам кардиган</li>
+        <li>один оффер</li>
+        <li>диапазон размеров</li>
+      </ul>
+      <div class="principle-row">
+        <span class="p">«Лёгкий кардиган 48–62»</span>
+        <span class="p">«Свободная посадка»</span>
+        <span class="p">«Тонкий кардиган для лета»</span>
+      </div>
+      <p style="color:var(--muted);font-size:13.5px;margin-top:16px">Победителя выбирать по CTR из выдачи, а не по субъективной красоте.</p>
+    </div>
+    <div class="card reveal delay1">
+      <div class="kicker" style="margin-bottom:14px"><span class="ln"></span>Название товара</div>
+      <h3>Подчеркнуть большие размеры</h3>
+      <p style="color:var(--muted);font-size:14.5px;margin-bottom:16px">Текущее название содержит общие запросы, но слабо выделяет главное отличие. Гипотезы для теста:</p>
+      <div class="pills">
+        <div class="pill"><span class="g">A</span>Кардиган женский летний тонкий больших размеров</div>
+        <div class="pill"><span class="g">B</span>Кофта-кардиган женская на пуговицах 48–62</div>
+        <div class="pill"><span class="g">C</span>Кардиган женский с цветочным принтом больших размеров</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog reveal" style="margin-top:22px">
+    <div class="q">Что изменить в ответах продавца</div>
+    <p>«Спасибо, что указали параметры. Нам жаль, что размерная сетка не помогла выбрать посадку. Модель действительно свободная и может большемерить — мы уточняем замеры каждого размера и добавим их в карточку».</p>
+    <div class="principle-row">
+      <span class="p">Признать проблему</span>
+      <span class="p">Уточнить факт</span>
+      <span class="p">Объяснить, что исправим</span>
+      <span class="p">Предложить помощь с размером</span>
+    </div>
+  </div>
+</section>
+
+<!-- Приоритеты -->
+<section class="block strat">
+  <div class="wrap">
+    <div class="shead">
+      <div class="t reveal"><div class="kicker"><span class="ln"></span>Приоритеты</div><h2>Порядок действий</h2></div>
+      <p class="meta reveal delay1">Сначала — устранить причины возвратов, только потом тестировать обложку и название.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="ti"><span class="s">1</span><span class="d"><b>Исправить размерную сетку</b><span>Убрать все противоречия и дубли</span></span></div>
+      <div class="ti"><span class="s">2</span><span class="d"><b>Сократить галерею</b><span>Удалить дубли, оставить 10–12</span></span></div>
+      <div class="ti"><span class="s">3</span><span class="d"><b>Переснять посадку</b><span>Реальные модели целевой комплекции</span></span></div>
+      <div class="ti"><span class="s">4</span><span class="d"><b>Честно о ткани</b><span>Показать толщину, состав, цвет</span></span></div>
+      <div class="ti"><span class="s">5</span><span class="d"><b>Убрать лишние слова</b><span>«Премиум», «любой сезон», «бабушки»</span></span></div>
+      <div class="ti"><span class="s">6</span><span class="d"><b>Собрать фотоотзывы</b><span>Официальные баллы Wildberries за фото</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART II ============ -->
+<section class="part" id="funnel">
+  <div class="wrap">
+    <div class="rn">II</div>
+    <div class="lbl">Часть вторая</div>
+    <h2>Контентная воронка на эмоциях</h2>
+    <p>Перестраиваем карточку: не перечислять свойства, а вести покупательницу от эмоции к уверенной покупке.</p>
+  </div>
+</section>
+
+<!-- Центральная идея + формула -->
+<section class="block wrap">
+  <div class="kicker reveal"><span class="ln"></span>Центральная идея</div>
+  <div class="bigquote reveal delay1" style="margin-top:22px">
+    <p>Женственный кардиган, в котором <em>комфортно быть собой</em>. Главная эмоция — «приятно нравиться себе».</p>
+  </div>
+  <div class="reveal delay1" style="margin-top:44px">
+    <div class="kicker"><span class="ln"></span>Эмоциональная формула</div>
+    <div class="formula">
+      <span class="f">Узнавание себя</span><span class="ar">→</span>
+      <span class="f">Желание примерить</span><span class="ar">→</span>
+      <span class="f">Доверие к посадке</span><span class="ar">→</span>
+      <span class="f">Уверенность в размере</span><span class="ar">→</span>
+      <span class="f">Снятие страхов</span><span class="ar">→</span>
+      <span class="f" style="border-color:var(--rose);color:var(--rose-deep)">Покупка</span>
+    </div>
+  </div>
+</section>
+
+<!-- Слайды детально -->
+<section class="block wrap" style="padding-top:0">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Слайд за слайдом</div><h2>Воронка на 12 слайдов</h2></div>
+    <p class="meta reveal delay1">Первые слайды создают желание, следующие помогают представить вещь в жизни, дальше — доказательства и мягкое закрытие.</p>
+  </div>
+  <div class="slides">
+    <div class="slidecard reveal"><div class="top"><span class="no">1</span><span class="task">Вызвать желание</span></div><h3>Женственность, в которой комфортно</h3><div class="subh">Лёгкий кардиган с цветочным принтом · 48–62</div><div class="vis">Реальная женщина 45–60 лет целевой комплекции, светлый интерьер, минимум ретуши. Текст ≤ 20% слайда.</div></div>
+    <div class="slidecard reveal delay1"><div class="top"><span class="no">2</span><span class="task">Дать эмоцию</span></div><h3>Ничего не нужно скрывать</h3><div class="subh">Свободная посадка мягко ложится и не обтягивает</div><div class="vis">Модель в естественном движении. Посыл не про стыд, а про комфорт и уверенность.</div></div>
+    <div class="slidecard reveal"><div class="top"><span class="no">3</span><span class="task">Показать посадку</span></div><h3>Красиво со всех сторон</h3><div class="subh">Вид спереди, сбоку и сзади</div><div class="vis">Одна модель, три ракурса. Рядом — рост 168, параметры и размер 54–56. Все цифры перепроверены.</div></div>
+    <div class="slidecard reveal delay1"><div class="top"><span class="no">4</span><span class="task">Закрыть страх ошибки</span></div><h3>Чтобы с первого раза подошёл размер</h3><div class="subh">Сравните замеры с вещью, которая хорошо сидит</div><div class="vis">Точная таблица замеров изделия: полуобхват, длина, рукав, рекомендуемый ОГ.</div></div>
+    <div class="slidecard reveal"><div class="top"><span class="no">5</span><span class="task">Вопрос о ткани</span></div><h3>Лёгкая, мягкая, приятная к телу</h3><div class="subh">Тонкий неутеплённый трикотаж</div><div class="vis">Макро структуры, ткань на свету. Честно показать толщину — не писать «для любого сезона».</div></div>
+    <div class="slidecard reveal delay1"><div class="top"><span class="no">6</span><span class="task">Практичность</span></div><h3>Одна вещь — много образов</h3><div class="subh">С джинсами, юбкой и классическими брюками</div><div class="vis">Три композиции. «Легко сочетается с базовыми вещами вашего гардероба».</div></div>
+    <div class="slidecard reveal"><div class="top"><span class="no">7</span><span class="task">Вариативность</span></div><h3>Носите так, как нравится вам</h3><div class="subh">Застёгнут — как кофта · расстёгнут — второй слой</div><div class="vis">Одна модель, одинаковый свет — чтобы читалось как одно изделие.</div></div>
+    <div class="slidecard reveal delay1"><div class="top"><span class="no">8</span><span class="task">Доказать качество</span></div><h3>Аккуратность в каждой детали</h3><div class="subh">Манжеты, ворот, пуговицы, планка, шов</div><div class="vis">Конкретная деталь убедительнее слова «премиальное качество».</div></div>
+    <div class="slidecard reveal"><div class="top"><span class="no">9</span><span class="task">Снять страх синтетики</span></div><h3>Комфорт на весь день</h3><div class="subh">35% хлопок · 65% полиэстер</div><div class="vis">Хлопок — приятно телу, полиэстер — держит форму. Честность повышает доверие.</div></div>
+    <div class="slidecard reveal delay1"><div class="top"><span class="no">10</span><span class="task">Снять страх ухода</span></div><h3>Любимая вещь без сложного ухода</h3><div class="subh">Бережная стирка до 30°C, сушка горизонтально</div><div class="vis">Все правила сверить с вшивным ярлыком.</div></div>
+    <div class="slidecard reveal"><div class="top"><span class="no">11</span><span class="task">Соц. доказательство</span></div><h3>Когда вещь действительно радует</h3><div class="subh">Реальные цитаты покупательниц</div><div class="vis">Три отзыва крупно, не скриншот переписки. Позже — фото покупателей.</div></div>
+    <div class="slidecard reveal delay1"><div class="top"><span class="no">12</span><span class="task">Мягко закрыть</span></div><h3>Для себя. Или для той, кого хочется порадовать</h3><div class="subh">Женственный и практичный подарок маме</div><div class="vis">Тёплый образ будущей жизни с вещью — без агрессивного «Купите сейчас».</div></div>
+  </div>
+</section>
+
+<!-- ============ PART III ============ -->
+<section class="part" id="tone">
+  <div class="wrap">
+    <div class="rn">III</div>
+    <div class="lbl">Часть третья</div>
+    <h2>Тон, вопросы и визуальный стиль</h2>
+    <p>Какие эмоции держим, что убираем из карточки и в каком визуальном коде всё оформляем.</p>
+  </div>
+</section>
+
+<!-- Эмоциональный тон -->
+<section class="block wrap">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Эмоциональный тон</div><h2>Нужные и ненужные сообщения</h2></div>
+  </div>
+  <div class="tone">
+    <div class="tcol good reveal">
+      <h3><span class="m">✓</span>Нужные эмоции</h3>
+      <ul>
+        <li>мне будет красиво</li>
+        <li>я буду чувствовать себя свободно</li>
+        <li>вещь не подчеркнёт лишнее</li>
+        <li>я легко соберу образ</li>
+        <li>я не ошибусь с размером</li>
+        <li>покупка практичная</li>
+        <li>такую вещь приятно подарить маме</li>
+      </ul>
+    </div>
+    <div class="tcol bad reveal delay1">
+      <h3><span class="m">✕</span>Ненужные сообщения</h3>
+      <ul>
+        <li>«скройте недостатки фигуры»</li>
+        <li>«омолаживает»</li>
+        <li>«для бабушек»</li>
+        <li>«идеально для всех»</li>
+        <li>«ограниченная коллекция»</li>
+        <li>«премиальное качество» без доказательств</li>
+        <li>«подходит для любого сезона»</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ + удалить -->
+<section class="block wrap" style="padding-top:0">
+  <div class="cards2" style="align-items:start">
+    <div class="reveal">
+      <div class="kicker" style="margin-bottom:18px"><span class="ln"></span>Финальный блок · коротко о главном</div>
+      <div class="faq">
+        <details open><summary>Кофта тёплая?<span class="pl">+</span></summary><div class="ans">Нет, это тонкий неутеплённый кардиган.</div></details>
+        <details><summary>Можно носить расстёгнутым?<span class="pl">+</span></summary><div class="ans">Да, как лёгкий второй слой.</div></details>
+        <details><summary>Есть карманы?<span class="pl">+</span></summary><div class="ans">Нет.</div></details>
+        <details><summary>Какая застёжка?<span class="pl">+</span></summary><div class="ans">Пуговицы по всей длине.</div></details>
+        <details><summary>Как выбрать размер?<span class="pl">+</span></summary><div class="ans">По замерам изделия и объёму груди.</div></details>
+        <details><summary>Подойдёт на невысокий рост?<span class="pl">+</span></summary><div class="ans">Показать реальную посадку на модели ростом ~158 см.</div></details>
+      </div>
+    </div>
+    <div class="reveal delay1">
+      <div class="kicker" style="margin-bottom:18px"><span class="ln"></span>Что удалить из карточки</div>
+      <div class="dellist">
+        <span class="x"><span class="m">✕</span>повторяющиеся фотографии</span>
+        <span class="x"><span class="m">✕</span>разные стилистики инфографики</span>
+        <span class="x"><span class="m">✕</span>чёрно-золотой слайд</span>
+        <span class="x"><span class="m">✕</span>«ограниченная коллекция»</span>
+        <span class="x"><span class="m">✕</span>«премиум» без доказательств</span>
+        <span class="x"><span class="m">✕</span>«для любого сезона»</span>
+        <span class="x"><span class="m">✕</span>формулировки про бабушек</span>
+        <span class="x"><span class="m">✕</span>меняющаяся длина и форма</span>
+        <span class="x"><span class="m">✕</span>противоречивые размеры</span>
+      </div>
+      <p style="color:var(--muted);font-size:14.5px;margin-top:22px">Итог — примерно 12–14 последовательных материалов вместо 30 повторов.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Визуальный стиль -->
+<section class="block strat">
+  <div class="wrap">
+    <div class="shead">
+      <div class="t reveal"><div class="kicker"><span class="ln"></span>Рекомендуемый визуальный стиль</div><h2>Спокойная современная женственность</h2></div>
+      <p class="meta reveal delay1">Не инфантильно-розовое. Именно в этом коде оформлен и данный лендинг.</p>
+    </div>
+    <div class="palette reveal">
+      <div class="sw"><div class="box" style="background:#F5EFE8"></div><span>Молочный фон</span></div>
+      <div class="sw"><div class="box" style="background:#B58B86"></div><span>Пыльно-розовый</span></div>
+      <div class="sw"><div class="box" style="background:#4A4A50"></div><span>Графитовый</span></div>
+      <div class="sw"><div class="box" style="background:#3A3A3D"></div><span>Тёмно-серый текст</span></div>
+    </div>
+    <div class="principles reveal delay1">
+      <div class="pr"><b>01</b><span>Одна мысль на слайд</span></div>
+      <div class="pr"><b>02</b><span>Не более 15–20 слов на изображении</span></div>
+      <div class="pr"><b>03</b><span>Один читаемый шрифт</span></div>
+      <div class="pr"><b>04</b><span>Декоративный шрифт — максимум в одном заголовке</span></div>
+      <div class="pr"><b>05</b><span>Минимум ретуши, честный цвет</span></div>
+      <div class="pr"><b>06</b><span>Реальная модель целевой комплекции</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART IV ============ -->
+<section class="part" id="brief">
+  <div class="wrap">
+    <div class="rn">IV</div>
+    <div class="lbl">Часть четвёртая</div>
+    <h2>Бриф съёмки</h2>
+    <p>Концепция «Современная женственность без возраста»: какую модель выбрать, какие образы собрать, какой интерьер и свет.</p>
+  </div>
+</section>
+
+<!-- Модель -->
+<section class="block wrap">
+  <div class="msplit">
+    <div class="ph reveal"><img src="assets/model-base.jpg" alt="Основная модель"></div>
+    <div class="reveal delay1">
+      <div class="kicker"><span class="ln"></span>Какую модель выбрать</div>
+      <h2 style="font-size:clamp(24px,2.8vw,36px);margin-top:14px">Реальный типаж, а не подиум</h2>
+      <div class="spec">
+        <div class="r"><span class="k">Возраст</span><span class="v">визуально 45–52 года</span></div>
+        <div class="r"><span class="k">Размер</span><span class="v">реальный 54–56</span></div>
+        <div class="r"><span class="k">Рост</span><span class="v">166–170 см</span></div>
+        <div class="r"><span class="k">Фигура</span><span class="v">мягкая, с заметными формами</span></div>
+        <div class="r"><span class="k">Подача</span><span class="v">спокойная, естественная улыбка</span></div>
+      </div>
+      <p style="color:var(--muted);font-size:14.5px;margin-top:18px">Критически важно: модель действительно носит указанный размер — без стягивания зажимами сзади. Для размерного слайда — вторая модель: рост 157–161, размер 60–62.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Образы -->
+<section class="block wrap" style="padding-top:0">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Образы</div><h2>Четыре готовых образа</h2></div>
+    <p class="meta reveal delay1">Кардиган несёт активный принт — остальное однотонное, спокойное, современное.</p>
+  </div>
+  <div class="looks">
+    <div class="look reveal"><div class="ph"><img src="assets/look-milk-full.jpg" alt="Образ 1"></div><div class="info"><div class="no">Образ №1</div><h3>Женственный повседневный</h3><p>Молочные брюки, кардиган застёгнут, лоферы. Главный образ обложки.</p></div></div>
+    <div class="look reveal delay1"><div class="ph"><img src="assets/look-open-full.jpg" alt="Образ 2"></div><div class="info"><div class="no">Образ №2</div><h3>С джинсами</h3><p>Расстёгнут поверх молочного топа, тёмно-синие джинсы, светлые кеды.</p></div></div>
+    <div class="look reveal delay2"><div class="ph"><img src="assets/look-work-console.jpg" alt="Образ 3"></div><div class="info"><div class="no">Образ №3</div><h3>Для работы и встречи</h3><p>Графитовые брюки или юбка миди, аккуратная обувь, лаконичная сумка.</p></div></div>
+    <div class="look reveal delay3"><div class="ph"><img src="assets/gift-scene.jpg" alt="Образ 4"></div><div class="info"><div class="no">Образ №4</div><h3>Подарок и тёплый сюжет</h3><p>Кресло, чашка или подарочная коробка. Ближе к финалу воронки.</p></div></div>
+  </div>
+</section>
+
+<!-- Интерьер, свет, оптика -->
+<section class="block wrap" style="padding-top:0">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Интерьер · свет · оптика</div><h2>Одна квартира — три зоны</h2></div>
+    <p class="meta reveal delay1">Современная светлая квартира в тёплой гамме — не дворец и не студия. Интерьер поддерживает вещь, а не спорит с ней.</p>
+  </div>
+  <div class="life reveal">
+    <div class="ph big"><img src="assets/interior-mirror.jpg" alt="У зеркала"></div>
+    <div class="ph"><img src="assets/interior-hallway.jpg" alt="Перед выходом"></div>
+    <div class="ph"><img src="assets/interior-back.jpg" alt="Посадка со спины"></div>
+  </div>
+  <div class="brief" style="margin-top:22px">
+    <div class="bcard reveal"><div class="i">i</div><h3>Три съёмочные зоны</h3><ul><li>У окна — обложка, полный рост, цвет, ракурсы</li><li>Кресло/диван — эмоции, мягкость, быт</li><li>Зеркало и консоль — «нравиться себе», образы</li></ul></div>
+    <div class="bcard reveal delay1"><div class="i">ii</div><h3>Свет</h3><ul><li>Мягкий дневной, 4300–4800K</li><li>Большое окно сбоку под ~45°</li><li>Белый отражатель напротив</li><li>Серый цвет остаётся нейтральным</li></ul></div>
+    <div class="bcard reveal delay2"><div class="i">iii</div><h3>Оптика и посадка</h3><ul><li>Полный рост — 50–70 мм, без ширика</li><li>1,5–2 м между моделью и фоном</li><li>Проверить плечевой шов и планку</li><li>Не натягивать край руками в каждом кадре</li></ul></div>
+  </div>
+</section>
+
+<!-- ============ PART V ============ -->
+<section class="part" id="prompts">
+  <div class="wrap">
+    <div class="rn">V</div>
+    <div class="lbl">Часть пятая</div>
+    <h2>Промпты для нейросети</h2>
+    <p>Как из референсов товара и модели точными промптами собрать весь визуал — без студийной съёмки.</p>
+  </div>
+</section>
+
+<section class="block prompts-sec">
+  <div class="wrap">
+    <div class="shead">
+      <div class="t reveal"><div class="kicker"><span class="ln"></span>Промпт-инжиниринг</div><h2>Пять типов промптов</h2></div>
+      <p class="meta reveal delay1">Ключ — строгие референсы и подробные списки «исключить», где ИИ ошибается чаще всего.</p>
+    </div>
+
+    <div class="prompt reveal">
+      <div class="code">
+        <div class="tag"><span class="dot"></span>Промпт 01 · Модель</div>
+        <h3>Реальная женщина, а не подиум</h3>
+        <div class="txt">«Фотореалистичная fashion-фотография женщины в полный рост. Возраст 45–52, рост ≈168, размер <span class="k">54–56</span>. Мягкая фигура plus size, живот слегка заметен, руки полные. Свет 4000–4500K, объектив 50 мм.
+<span class="k">Исключить:</span> молодое лицо, худобу, плоский живот, узкую талию, кукольную кожу, ретушь, неправильные пальцы».</div>
+        <div class="refs"><span class="r">Фотореализм</span><span class="r">3:4</span><span class="r">Без ретуши</span></div>
+      </div>
+      <div class="out"><div class="imgs"><div class="im"><img src="assets/model-base.jpg" alt="Модель"></div></div><div class="cap">Результат — базовый образ модели</div></div>
+    </div>
+
+    <div class="prompt rev reveal">
+      <div class="out"><div class="imgs four"><div class="im"><img src="assets/product-front.jpg" alt="перёд"></div><div class="im"><img src="assets/product-side.jpg" alt="бок"></div><div class="im"><img src="assets/product-back.jpg" alt="спина"></div><div class="im"><img src="assets/product-detail.jpg" alt="деталь"></div></div><div class="cap">Рендер: перёд · бок · спина · деталь</div></div>
+      <div class="code">
+        <div class="tag"><span class="dot"></span>Промпт 02 · Предметный рендер</div>
+        <h3>Точная копия, а не «похожая вещь»</h3>
+        <div class="txt">«Строгие референсы одного товара. Требуется <span class="k">точное воспроизведение</span>: форма, швы, горловина, манжеты, количество пуговиц, точный рисунок и масштаб узора, исходный цвет. На невидимом манекене.
+<span class="k">Не заменяй</span> узор похожим, не добавляй карманы и логотипы».</div>
+        <div class="refs"><span class="r">4 референса</span><span class="r">Невидимый манекен</span><span class="r">Белый фон</span></div>
+      </div>
+    </div>
+
+    <div class="prompt reveal">
+      <div class="code">
+        <div class="tag"><span class="dot"></span>Промпт 03 · Товар на модели</div>
+        <h3>«Надень» кардиган на реальную фигуру</h3>
+        <div class="txt">«Надень товар с фото 2–5 на женщину с фото 1. Сохрани внешность и <span class="k">реальные пропорции</span>: не сужай талию, не делай живот плоским. Ткань повторяет объём, складки правдоподобны, швы анатомичны.
+<span class="k">Не утягивай</span> фигуру и не деформируй узор на груди».</div>
+        <div class="refs"><span class="r">Модель + 4 ракурса</span><span class="r">Единый свет</span></div>
+      </div>
+      <div class="out"><div class="imgs two"><div class="im"><img src="assets/look-front.jpg" alt="спереди"></div><div class="im"><img src="assets/look-back.jpg" alt="сзади"></div></div><div class="cap">Результат — посадка на реальной фигуре</div></div>
+    </div>
+
+    <div class="prompt rev reveal">
+      <div class="out"><div class="imgs two"><div class="im"><img src="assets/macro-cuff.jpg" alt="манжета"></div><div class="im"><img src="assets/macro-fabric.jpg" alt="ткань"></div></div><div class="cap">Детали в единой фотосессии</div></div>
+      <div class="code">
+        <div class="tag"><span class="dot"></span>Промпт 04 · Крупный план</div>
+        <h3>Детали из той же «съёмки»</h3>
+        <div class="txt">«Последнее изображение — <span class="k">строгий референс той же фотосессии</span>, кадр через несколько секунд. Сохрани модель, кожу, маникюр, дизайн, свет и цветокоррекцию. Видны вязка, петли, заломы у запястья. Объектив 85–100 мм».</div>
+        <div class="refs"><span class="r">Преемственность</span><span class="r">Тот же свет</span></div>
+      </div>
+    </div>
+
+    <div class="prompt reveal">
+      <div class="code">
+        <div class="tag"><span class="dot"></span>Промпт 05 · Сценарий видео</div>
+        <h3>Живое видео для карточки</h3>
+        <div class="txt">«Рекламное fashion-видео 25–28 сек, вертикаль 3:4. Бытовая сцена в квартире, инструментальная музыка, русские субтитры. Фото 1 — референс внешности: не омолаживай. Фото 2–5 — референс кардигана: крой, серо-графитовый цвет, масштаб принта.
+<span class="k">Не меняй изделие между кадрами»</span>.</div>
+        <div class="refs"><span class="r">25–28 сек</span><span class="r">Субтитры</span><span class="r">Быт, не студия</span></div>
+      </div>
+      <div class="out"><div class="imgs two"><div class="im"><img src="assets/interior-hallway.jpg" alt="сцена"></div><div class="im"><img src="assets/interior-mirror.jpg" alt="зеркало"></div></div><div class="cap">Кадры атмосферного сюжета</div></div>
+    </div>
+
+    <div class="technique">
+      <div class="tq reveal"><div class="i">i</div><h4>Строгие референсы</h4><p>Каждый промпт опирается на фото товара и модели с прямым «точное воспроизведение, а не похожее».</p></div>
+      <div class="tq reveal delay1"><div class="i">ii</div><h4>Списки «исключить»</h4><p>Отдельным блоком запрещаем омоложение, похудение, лишние пальцы, подмену узора.</p></div>
+      <div class="tq reveal delay2"><div class="i">iii</div><h4>Преемственность серии</h4><p>Каждый кадр ссылается на предыдущий — свет, кожа и цвет держатся во всей воронке.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULT ============ -->
+<section class="part" id="result">
+  <div class="wrap">
+    <div class="rn">VI</div>
+    <div class="lbl">Итог</div>
+    <h2>Что получилось</h2>
+    <p>Одна модель, единый свет и цвет, честная посадка и реальные детали — целая фотоворонка, собранная промптами.</p>
+  </div>
+</section>
+
+<section class="block wrap">
+  <div class="gallery reveal">
+    <div class="gcell wide plain" style="aspect-ratio:auto"><img src="assets/cover.jpg" alt="Обложка"><span class="cap">Новая обложка</span></div>
+    <div class="gcell"><img src="assets/look-front.jpg" alt=""><span class="cap">Посадка спереди</span></div>
+    <div class="gcell"><img src="assets/look-open-full.jpg" alt=""><span class="cap">Второй слой</span></div>
+    <div class="gcell"><img src="assets/look-work-stool.jpg" alt=""><span class="cap">Для встречи</span></div>
+    <div class="gcell"><img src="assets/look-work-console.jpg" alt=""><span class="cap">Для работы</span></div>
+    <div class="gcell"><img src="assets/detail-neckline.jpg" alt=""><span class="cap">Горловина</span></div>
+    <div class="gcell"><img src="assets/macro-cuff.jpg" alt=""><span class="cap">Манжета</span></div>
+    <div class="gcell"><img src="assets/look-back.jpg" alt=""><span class="cap">Со спины</span></div>
+    <div class="gcell"><img src="assets/interior-mirror.jpg" alt=""><span class="cap">У зеркала</span></div>
+    <div class="gcell"><img src="assets/interior-back.jpg" alt=""><span class="cap">Длина и посадка</span></div>
+    <div class="gcell wide"><img src="assets/gift-scene.jpg" alt=""><span class="cap">Эмоциональный финал — подарок</span></div>
+  </div>
+
+  <div class="insight reveal">
+    <div class="kicker"><span class="ln" style="background:var(--rose)"></span>Главный резерв роста</div>
+    <p>Красивая обложка поднимает клики. Но настоящий рост даёт <em>выкуп</em> — когда покупательница не ошибается с размером.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fbrand">КЕЙС · <b>Кардиган</b></div>
+    <div class="cols">
+      <div class="col"><h4>Части</h4><a href="#analysis">I · Анализ</a><a href="#funnel">II · Воронка</a><a href="#tone">III · Тон и стиль</a><a href="#brief">IV · Съёмка</a></div>
+      <div class="col"><h4>&nbsp;</h4><a href="#prompts">V · Промпты</a><a href="#result">Итог · Результат</a></div>
+      <div class="col"><h4>Что сделали</h4><p>Разбор 86 отзывов</p><p>Воронка из 12 слайдов</p><p>Бриф съёмки</p><p>5 типов промптов</p></div>
+      <div class="col"><h4>Результат</h4><p>Фотоворонка без студии</p><p>Единый визуальный код</p><p>Готово к выступлению</p></div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 · Кейс для выступления. Анализ → Воронка → Тон → Съёмка → Промпты → Результат.</span>
+      <span>Оформлено в фирменной палитре проекта</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const hdr=document.getElementById('hdr');
+const prog=document.getElementById('prog');
+const onScroll=()=>{
+  hdr.classList.toggle('solid',window.scrollY>window.innerHeight*0.7);
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  prog.style.width=(h>0?(window.scrollY/h*100):0)+'%';
+};
+onScroll();window.addEventListener('scroll',onScroll,{passive:true});
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
