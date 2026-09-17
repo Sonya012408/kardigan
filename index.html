@@ -71,7 +71,7 @@ header.solid{background:rgba(245,239,232,.92);backdrop-filter:blur(14px);color:v
 /* speaker */
 .speaker{min-height:100svh;background:var(--graphite);color:#efe9e2;display:grid;grid-template-columns:1.08fr .92fr;overflow:hidden}
 .speaker .txt{display:flex;flex-direction:column;justify-content:center;padding:120px 64px 80px max(40px,calc((100vw - 1240px)/2 + 40px))}
-.speaker h1{font-size:clamp(46px,6.4vw,92px);color:#fff;margin-top:26px;letter-spacing:.01em}
+.speaker h1{font-size:clamp(46px,6.4vw,92px);color:#fff;letter-spacing:.01em}
 .speaker h1 em{font-style:italic;color:#f2e4e0}
 .speaker .sub{margin-top:24px;max-width:44ch;font-size:clamp(17px,1.7vw,21px);color:#d9d2ca;line-height:1.5}
 .speaker .sub b{font-weight:400;color:#fff}
@@ -355,6 +355,7 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
 @media(max-width:860px){
   .wrap{padding:0 22px}
   header,header.solid{padding:14px 22px}
+  .brand{font-size:12px;letter-spacing:.14em;white-space:nowrap}
   .block{padding:70px 0}
   .block.wrap{padding-left:22px;padding-right:22px}
   .part{padding:66px 0}
@@ -381,7 +382,6 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
 <!-- ============ SPEAKER ============ -->
 <section class="speaker" id="speaker">
   <div class="txt">
-    <div class="kicker light"><span class="ln"></span>Big Russian Brands · Мастермайнд 2026</div>
     <h1 class="display">Никита <em>Баландин</em></h1>
     <p class="sub">Основатель мебельного холдинга <b>ProstoHome, ProstoNova, Mur&nbsp;&amp;&nbsp;Gav</b> · Екатеринбург</p>
     <div class="facts">
@@ -402,14 +402,14 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
     <p class="meta reveal delay1">Своё производство в Екатеринбурге. Продажи на Wildberries, Ozon, Яндекс Маркете и в B2B.</p>
   </div>
   <div class="brands">
-    <div class="brand-card reveal"><div class="cat">Стулья и кресла</div><h3>ProstoHome</h3><p>Флагман холдинга: #2 в категории «Стулья» на Wildberries среди 40 000+ товаров.</p><div class="tagline">Экспертиза «Сколково»</div></div>
+    <div class="brand-card reveal"><div class="cat">Стулья и кресла</div><h3>ProstoHome</h3><p>Флагман холдинга: #1 в категории «Стулья» на Wildberries среди 40 000+ товаров.</p><div class="tagline">Экспертиза «Сколково»</div></div>
     <div class="brand-card reveal delay1"><div class="cat">Столы и пуфы</div><h3>ProstoNova</h3><p>Рейтинг 4,8–4,9 на всех площадках, 1 500+ отзывов на Wildberries.</p><div class="tagline">WB · Ozon · Яндекс Маркет</div></div>
     <div class="brand-card reveal delay2"><div class="cat">Лежанки для животных</div><h3>Mur &amp; Gav</h3><p>Запущен с нуля в 2026 году, в августе — уже 815 заказов. Шьют из отходов мебельного цеха.</p><div class="tagline">Безотходная модель</div></div>
   </div>
   <div class="mtable five reveal">
-    <div class="cell"><b>50 млн ₽</b><span>Средняя выручка в месяц · по холдингу</span></div>
+    <div class="cell"><b>70 млн ₽</b><span>Средняя выручка в месяц · по холдингу</span></div>
     <div class="cell"><b>4,9 ★</b><span>Рейтинг · 6 294 отзыва</span></div>
-    <div class="cell"><b>#2</b><span>В стульях · из 40 000+ товаров</span></div>
+    <div class="cell"><b>#1</b><span>В стульях · из 40 000+ товаров</span></div>
     <div class="cell"><b>5 235</b><span>Кресел в месяц · ProstoHome</span></div>
     <div class="cell"><b>1 125</b><span>Столов в месяц · ProstoNova</span></div>
   </div>
@@ -419,7 +419,7 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
 <section class="block strat">
   <div class="wrap">
     <div class="shead">
-      <div class="t reveal"><div class="kicker"><span class="ln"></span>Компетенции</div><h2>С чем приходит на разбор</h2></div>
+      <div class="t reveal"><div class="kicker"><span class="ln"></span>Компетенции</div></div>
       <p class="meta reveal delay1">Всё — из собственной практики, без инфобизнес-шелухи.</p>
     </div>
     <div class="cards2">
