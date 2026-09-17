@@ -33,6 +33,7 @@ h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.1}
 .wrap{max-width:1240px;margin:0 auto;padding:0 40px}
 section{position:relative}
 .block{padding:110px 0}
+.block.wrap{padding-left:40px;padding-right:40px}
 .reveal{opacity:0;transform:translateY(32px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
 .reveal.in{opacity:1;transform:none}
 .delay1{transition-delay:.09s}.delay2{transition-delay:.18s}.delay3{transition-delay:.27s}.delay4{transition-delay:.36s}.delay5{transition-delay:.45s}
@@ -66,6 +67,34 @@ header.solid{background:rgba(245,239,232,.92);backdrop-filter:blur(14px);color:v
 .scroll-cue{position:absolute;left:40px;bottom:26px;z-index:4;color:#fff;font-size:11px;letter-spacing:.28em;text-transform:uppercase;opacity:.85;display:flex;align-items:center;gap:14px}
 .scroll-cue .bar{width:46px;height:1px;background:linear-gradient(90deg,#fff,transparent);animation:cue 2s infinite}
 @keyframes cue{0%{opacity:.2;transform:scaleX(.3);transform-origin:left}50%{opacity:1}100%{opacity:.2;transform:scaleX(1);transform-origin:left}}
+
+/* speaker */
+.speaker{min-height:100svh;background:var(--graphite);color:#efe9e2;display:grid;grid-template-columns:1.08fr .92fr;overflow:hidden}
+.speaker .txt{display:flex;flex-direction:column;justify-content:center;padding:120px 64px 80px max(40px,calc((100vw - 1240px)/2 + 40px))}
+.speaker h1{font-size:clamp(46px,6.4vw,92px);color:#fff;margin-top:26px;letter-spacing:.01em}
+.speaker h1 em{font-style:italic;color:#f2e4e0}
+.speaker .sub{margin-top:24px;max-width:44ch;font-size:clamp(17px,1.7vw,21px);color:#d9d2ca;line-height:1.5}
+.speaker .sub b{font-weight:400;color:#fff}
+.speaker .facts{margin-top:38px;max-width:520px;border-top:1px solid #45454c}
+.speaker .facts .r{display:flex;gap:20px;align-items:baseline;padding:13px 0;border-bottom:1px solid #45454c;font-size:15.5px;color:#cfc9c2}
+.speaker .facts .r .k{flex:0 0 74px;font-family:var(--serif);font-style:italic;color:var(--rose);font-size:17px}
+.speaker .ph{position:relative;overflow:hidden;background:#dcd6cf}
+.speaker .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%;transform:scale(1.06);animation:hz 10s ease forwards}
+.speaker .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,17,18,.5),transparent 16%),linear-gradient(90deg,rgba(46,46,51,.35),transparent 28%)}
+.mtable.five{grid-template-columns:repeat(5,1fr)}
+.brands{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:22px}
+.brand-card{background:var(--paper);border:1px solid var(--line);padding:30px 28px 28px}
+.brand-card .cat{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.brand-card h3{font-size:30px;margin:8px 0 14px;color:var(--graphite)}
+.brand-card p{font-size:15px;color:#4a4a4d;line-height:1.55}
+.brand-card .tagline{margin-top:18px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--rose-deep)}
+@media(max-width:980px){.mtable.five{grid-template-columns:1fr 1fr}.mtable.five .cell:last-child{grid-column:span 2}}
+@media(max-width:860px){
+  .speaker{grid-template-columns:1fr}
+  .speaker .ph{order:-1;min-height:62svh}
+  .speaker .txt{padding:44px 22px 64px}
+  .brands{grid-template-columns:1fr}
+}
 
 /* part divider */
 .part{padding:96px 0;background:var(--graphite);color:#efe9e2;text-align:center;position:relative;overflow:hidden}
@@ -299,6 +328,20 @@ table.fn tbody tr:last-child td{border-bottom:0}
 .insight p em{font-style:italic;color:var(--rose-hair)}
 @media(max-width:860px){.insight{padding:34px 28px}}
 
+/* channel cta */
+.cta{display:grid;grid-template-columns:1.25fr .75fr;gap:64px;align-items:center}
+.cta h2{font-size:clamp(30px,4.2vw,54px);margin-top:16px;color:var(--graphite)}
+.cta h2 em{font-style:italic;color:var(--rose-deep)}
+.cta .lead{margin-top:22px;max-width:46ch}
+.cta .btn{display:inline-flex;align-items:center;gap:14px;margin-top:34px;background:var(--graphite);color:#fff;border-radius:100px;padding:16px 30px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;transition:background .35s}
+.cta .btn:hover{background:var(--rose-deep)}
+.cta .btn .ar{color:var(--rose-hair);font-size:16px;letter-spacing:0}
+.qr{background:var(--paper);border:1px solid var(--line);padding:28px 28px 22px;box-shadow:var(--shadow);text-align:center;max-width:340px;justify-self:end;width:100%}
+.qr img{width:100%;height:auto;image-rendering:pixelated}
+.qr .cap{margin-top:16px;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.qr .cap b{display:block;margin-top:6px;font-family:var(--serif);font-style:italic;font-weight:400;font-size:18px;letter-spacing:0;text-transform:none;color:var(--rose-deep)}
+@media(max-width:860px){.cta{grid-template-columns:1fr;gap:40px}.cta .btn{letter-spacing:.06em;padding:15px 22px;font-size:12px;white-space:nowrap}.qr{justify-self:center;max-width:280px}}
+
 /* footer */
 footer{background:var(--graphite);color:#cfc9c2;padding:74px 0 44px}
 footer .fbrand{font-family:var(--serif);font-size:22px;letter-spacing:.24em;text-transform:uppercase;color:#fff}
@@ -312,6 +355,7 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
   .wrap{padding:0 22px}
   header,header.solid{padding:14px 22px}
   .block{padding:70px 0}
+  .block.wrap{padding-left:22px;padding-right:22px}
   .part{padding:66px 0}
   .scroll-cue{left:22px}
 }
@@ -323,6 +367,7 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
 <header id="hdr">
   <div class="brand">КЕЙС · <b>Кардиган</b> · Wildberries</div>
   <nav class="nav">
+    <a href="#speaker">Спикер</a>
     <a href="#analysis">Анализ</a>
     <a href="#funnel">Воронка</a>
     <a href="#tone">Тон</a>
@@ -331,6 +376,73 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
     <a href="#result">Результат</a>
   </nav>
 </header>
+
+<!-- ============ SPEAKER ============ -->
+<section class="speaker" id="speaker">
+  <div class="txt">
+    <div class="kicker light"><span class="ln"></span>Big Russian Brands · Мастермайнд 2026</div>
+    <h1 class="display">Никита <em>Баландин</em></h1>
+    <p class="sub">Основатель мебельного холдинга <b>ProstoHome, ProstoNova, Mur&nbsp;&amp;&nbsp;Gav</b> · Екатеринбург</p>
+    <div class="facts">
+      <div class="r"><span class="k">2010</span><span>Предприниматель с 2010 года</span></div>
+      <div class="r"><span class="k">750 млн</span><span>5 лет в маркетплейсах: с нуля до 750 млн ₽</span></div>
+      <div class="r"><span class="k">×4</span><span>2025: рост за год — 60 → 240 млн ₽ оборота</span></div>
+      <div class="r"><span class="k">4+ года</span><span>Внедряет ИИ в операционку</span></div>
+      <div class="r"><span class="k">семья</span><span>Жена Валерия, дети София и Мирослав</span></div>
+    </div>
+  </div>
+  <div class="ph"><img src="assets/nikita.jpg" alt="Никита Баландин"></div>
+</section>
+
+<!-- Холдинг в цифрах -->
+<section class="block wrap">
+  <div class="shead">
+    <div class="t reveal"><div class="kicker"><span class="ln"></span>Холдинг</div><h2>Три бренда — одно производство</h2></div>
+    <p class="meta reveal delay1">Своё производство в Екатеринбурге. Продажи на Wildberries, Ozon, Яндекс Маркете и в B2B.</p>
+  </div>
+  <div class="brands">
+    <div class="brand-card reveal"><div class="cat">Стулья и кресла</div><h3>ProstoHome</h3><p>Флагман холдинга: #2 в категории «Стулья» на Wildberries среди 40 000+ товаров.</p><div class="tagline">Экспертиза «Сколково»</div></div>
+    <div class="brand-card reveal delay1"><div class="cat">Столы и пуфы</div><h3>ProstoNova</h3><p>Рейтинг 4,8–4,9 на всех площадках, 1 500+ отзывов на Wildberries.</p><div class="tagline">WB · Ozon · Яндекс Маркет</div></div>
+    <div class="brand-card reveal delay2"><div class="cat">Лежанки для животных</div><h3>Mur &amp; Gav</h3><p>Запущен с нуля в 2026 году, в августе — уже 815 заказов. Шьют из отходов мебельного цеха.</p><div class="tagline">Безотходная модель</div></div>
+  </div>
+  <div class="mtable five reveal">
+    <div class="cell"><b>50 млн ₽</b><span>Средняя выручка в месяц · по холдингу</span></div>
+    <div class="cell"><b>4,9 ★</b><span>Рейтинг · 6 294 отзыва</span></div>
+    <div class="cell"><b>#2</b><span>В стульях · из 40 000+ товаров</span></div>
+    <div class="cell"><b>5 235</b><span>Кресел в месяц · ProstoHome</span></div>
+    <div class="cell"><b>1 125</b><span>Столов в месяц · ProstoNova</span></div>
+  </div>
+</section>
+
+<!-- Компетенции -->
+<section class="block strat">
+  <div class="wrap">
+    <div class="shead">
+      <div class="t reveal"><div class="kicker"><span class="ln"></span>Компетенции</div><h2>С чем приходит на разбор</h2></div>
+      <p class="meta reveal delay1">Всё — из собственной практики, без инфобизнес-шелухи.</p>
+    </div>
+    <div class="cards2">
+      <div class="prob reveal"><div class="no">01</div><h3>Масштабирование на маркетплейсах</h3><p>5 лет практики: аналитика, реклама, позиции, юнит-экономика. Весь путь от нуля до 750 млн ₽ прошёл сам.</p><div class="tagline">×4 за год · 60 → 240 млн ₽</div></div>
+      <div class="prob reveal delay1"><div class="no">02</div><h3>Производство и вывод продукта</h3><p>Полный цикл — от сырья до карточки WB. Новый продукт выводят за 60 дней по регламенту из 16 документов.</p><div class="tagline">Целевая маржа от 30%</div></div>
+      <div class="prob reveal"><div class="no">03</div><h3>ИИ в операционке</h3><p>Нейрофото и A/B-тесты обложек ещё до запуска товара в производство. Свои ИИ-агенты на своём сервере: аналитика, поиск, отчёты.</p><div class="tagline">4+ года · свои агенты</div></div>
+      <div class="prob reveal delay1"><div class="no">04</div><h3>Разборы «как бизнес-ангел»</h3><p>Ищет слабые места модели: где теряются деньги и где спрятан незаметный рост. Прожарка юнит-экономики.</p><div class="tagline">Жёсткие вопросы · точки роста</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Признание и горизонт -->
+<section class="block wrap">
+  <div class="kicker reveal"><span class="ln"></span>Признание и горизонт</div>
+  <div class="bigquote reveal delay1" style="margin-top:24px">
+    <p>Проект ProstoHome прошёл экспертизу Фонда <em>«Сколково»</em> — июль 2026.</p>
+  </div>
+  <div class="steps reveal" style="margin-top:52px">
+    <div class="ti"><span class="s">1</span><span class="d"><b>Укомплектовать квартиру целиком</b><span>ProstoNova · модульные диваны со сменными чехлами</span></span></div>
+    <div class="ti"><span class="s">2</span><span class="d"><b>№1 по лежанкам в России</b><span>Цель Mur &amp; Gav</span></span></div>
+    <div class="ti"><span class="s">3</span><span class="d"><b>Ironman 226 км и Эльбрус</b><span>Лето 2026 — бизнес как марафон на результат</span></span></div>
+    <div class="ti"><span class="s">4</span><span class="d"><b>Telegram @vsegdaprosto</b><span>Про управление, команду, AI, продукт и маркетинг</span></span></div>
+  </div>
+</section>
 
 <!-- HERO -->
 <section class="hero">
@@ -833,12 +945,28 @@ footer .fbot{border-top:1px solid #45454b;padding-top:24px;display:flex;justify-
   </div>
 </section>
 
+<!-- ============ CHANNEL ============ -->
+<section class="block strat" id="channel">
+  <div class="wrap cta">
+    <div class="reveal">
+      <div class="kicker"><span class="ln"></span>Забрать инструкцию</div>
+      <h2>Пошаговая инструкция — <em>в канале</em></h2>
+      <p class="lead">Подпишитесь на Telegram-канал Никиты: там пост с пошаговой инструкцией, как создать продающую карточку товара.</p>
+      <a class="btn" href="https://t.me/vsegdaprosto" target="_blank" rel="noopener">Подписаться · @vsegdaprosto <span class="ar">→</span></a>
+    </div>
+    <div class="qr reveal delay1">
+      <img src="assets/qr-channel.png" alt="QR-код: t.me/vsegdaprosto">
+      <div class="cap">Наведите камеру<b>@vsegdaprosto</b></div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="fbrand">КЕЙС · <b>Кардиган</b></div>
     <div class="cols">
-      <div class="col"><h4>Части</h4><a href="#analysis">I · Анализ</a><a href="#funnel">II · Воронка</a><a href="#tone">III · Тон и стиль</a><a href="#brief">IV · Съёмка</a></div>
-      <div class="col"><h4>&nbsp;</h4><a href="#prompts">V · Промпты</a><a href="#result">Итог · Результат</a></div>
+      <div class="col"><h4>Части</h4><a href="#speaker">Спикер</a><a href="#analysis">I · Анализ</a><a href="#funnel">II · Воронка</a><a href="#tone">III · Тон и стиль</a><a href="#brief">IV · Съёмка</a></div>
+      <div class="col"><h4>&nbsp;</h4><a href="#prompts">V · Промпты</a><a href="#result">Итог · Результат</a><a href="#channel">Инструкция в канале</a></div>
       <div class="col"><h4>Что сделали</h4><p>Разбор 86 отзывов</p><p>Воронка из 12 слайдов</p><p>Бриф съёмки</p><p>5 типов промптов</p></div>
       <div class="col"><h4>Результат</h4><p>Фотоворонка без студии</p><p>Единый визуальный код</p><p>Готово к выступлению</p></div>
     </div>
